@@ -1,0 +1,10 @@
+A = float(input())
+B = float(input())
+C = float(input())
+TRIANGULO = ((A*B)/2)
+CIRCULO = (3,14159*(C**2))
+TRAPEZIO = (((A+B)*C)/2)
+QUADRADO = (B*B)
+RETANGULO = (A*B)
+
+print (f'TRIANGULO = {TRIANGULO:.3f}')

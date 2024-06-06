@@ -13,9 +13,7 @@ def ParkingSpace():
 
     vagas = [vaga1, vaga2, vaga3, vaga4, vaga4, vaga5, vaga6, vaga7, vaga8]
 
-    vagas_vermelhas = []
-
-    video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy Park\videos\vagas.mp4')
+    video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas.mp4')
     check = True
 
     while check == True:
@@ -32,8 +30,6 @@ def ParkingSpace():
         imgDil = cv2.dilate(imgBlur, kernel)
         mask = np.zeros_like(img)
 
-        
-
         # desenhando quadradinhos verdes sobre a img
         for x, y, w, h in vagas:
             cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 255, 255), -1)
@@ -41,12 +37,10 @@ def ParkingSpace():
             qtPxBranco = cv2.countNonZero(recorte)
             cv2.putText(img,str(qtPxBranco),(x,y+h-10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1)
         
-            
             if qtPxBranco > 3000:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255), 2)
                 
     
-        
             else:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
 
@@ -62,4 +56,7 @@ def ParkingSpace():
     video.release()
     cv2.destroyAllWindows()
 
+cont = 0
+if cont == 0:
 
+    ParkingSpace()

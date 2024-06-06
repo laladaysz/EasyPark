@@ -1,2 +1,9 @@
 .env/
-# yolov5/
+yolov5/
+sort/
+plate.pt/
+yolov5n.pt/
+videos/
+yolov5s.pt/
+chars.pt/
+__pycache__/
