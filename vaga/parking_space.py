@@ -18,8 +18,21 @@ def ParkingSpace():
     video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas.mp4')
     check = True
     # qPLR = PlateRecognition(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\placas.mp4')
-    
+
     capturado = [False] * len(vagas)
+
+    def cropping_spaces(image, coordinates, output_path):
+        img = cv2.imread(image)
+
+        x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
+
+
+        # NAO PODE SER DO MAIOR PRO MENOR TEM QUE MUDAR ISSO
+        cropped_image = img[y1:y2, x2:x1] # 87: 212, 439, 135
+        # cropped_image = img[87:212, 135:439] # 87:212, 439:135
+
+        cv2.imwrite(output_path, cropped_image)
+        # cv2.imwrite(output_path, img)
 
     while check == True:
         check,img = video.read() 
@@ -46,9 +59,12 @@ def ParkingSpace():
             if qtPxBranco > 4500 and not capturado[i]:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255), 2)
             
-                cv2.imwrite(f"frame_vaga{i+1}.jpg", img)
+
+                name_frame = f"frame_vaga{i+1}.jpg"
+                cv2.imwrite(name_frame, img)
                 capturado[i] = True
-                print (f"capturado com sucesso! {i+1}")              
+                print (f"capturado com sucesso! {i+1}")      
+                cropping_spaces(name_frame, vagas[i], f"crop_vaga{i+1}.jpg")   
                 continue
     
             else:
