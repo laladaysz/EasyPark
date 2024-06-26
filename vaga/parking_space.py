@@ -25,10 +25,10 @@ def ParkingSpace():
         img = cv2.imread(image)
 
         x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
-
+  
 
         # NAO PODE SER DO MAIOR PRO MENOR TEM QUE MUDAR ISSO
-        cropped_image = img[y1:y2, x2:x1] # 87: 212, 439, 135
+        cropped_image = img[y:y+h,x:x+w] # 87: 212, 439, 135
         # cropped_image = img[87:212, 135:439] # 87:212, 439:135
 
         cv2.imwrite(output_path, cropped_image)
@@ -78,8 +78,6 @@ def ParkingSpace():
             break
 
                 
-    
-    
     video.release()
     cv2.destroyAllWindows()
 
