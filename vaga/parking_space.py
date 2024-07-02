@@ -49,14 +49,18 @@ def ParkingSpace():
         imgDil = cv2.dilate(imgBlur, kernel)
         mask = np.zeros_like(img)
 
+        parking_status = []
+        
         # desenhando quadradinhos verdes sobre a img 
         for i, (x, y, w, h) in enumerate(vagas):
             cv2.rectangle(mask, (x, y), (x + w, y + h), (255, 255, 255), -1)
             recorte = imgDil[y:y+h,x:x+w]
             qtPxBranco = cv2.countNonZero(recorte)
             cv2.putText(img,str(qtPxBranco),(x,y+h-10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1)
+            status = "Free"
             
             if qtPxBranco > 4500 and not capturado[i]:
+                status="Occupied"
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255), 2)
             
 
@@ -69,7 +73,19 @@ def ParkingSpace():
     
             else:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
-  
+
+            parking_status.append({"spot_id": i + 1, "status": status})  
+
+
+        # api_url = "http://127.0.0.1:8000/api/receive-status/"  
+        # headers = {'Content-Type': 'application/json'}
+        # response = requests.post(api_url, data=json.dumps(parking_status), headers=headers)
+
+        # if response.status_code == 200:
+        #     print("Dados enviados com sucesso!")
+        # else:
+        #     print("Erro ao enviar os dados:", response.text)
+
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
