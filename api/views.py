@@ -4,6 +4,7 @@ from rest_framework import status
 from base.models import owner
 from .serializers import ownerSerializer
 
+parking_status = []
 
 # @api_view(['POST'])
 # def receive_crop(request):
