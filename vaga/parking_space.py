@@ -1,9 +1,22 @@
+import aiohttp
 import cv2
 import numpy as np
+import requests
+import json
 
 # from LPR.main import PlateRecognition
 
-def ParkingSpace():
+async def send_parking_status(parking_status):
+    headers = {'Content-Type': 'application/json'}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post('http://localhost:8000/api/receive-status/', data=json.dumps(parking_status), headers=headers) as response:
+            if response.status == 200:
+                print("Dados enviados com sucesso!")
+            else:
+                print("Erro ao enviar os dados:", await response.text())
+
+async def ParkingSpace():
     vaga1 = [1, 89, 108, 213]
     vaga2 = [115, 87, 152, 211]
     vaga3 = [289, 89, 138, 212]
@@ -21,18 +34,7 @@ def ParkingSpace():
 
     capturado = [False] * len(vagas)
 
-    def cropping_spaces(image, coordinates, output_path):
-        img = cv2.imread(image)
-
-        x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
-  
-
-        # NAO PODE SER DO MAIOR PRO MENOR TEM QUE MUDAR ISSO
-        cropped_image = img[y:y+h,x:x+w] # 87: 212, 439, 135
-        # cropped_image = img[87:212, 135:439] # 87:212, 439:135
-
-        cv2.imwrite(output_path, cropped_image)
-        # cv2.imwrite(output_path, img)
+    
 
     while check == True:
         check,img = video.read() 
@@ -50,6 +52,20 @@ def ParkingSpace():
         mask = np.zeros_like(img)
 
         parking_status = []
+
+
+        def cropping_spaces(image, coordinates, output_path):
+            img = cv2.imread(image)
+
+            # x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
+    
+
+            # NAO PODE SER DO MAIOR PRO MENOR TEM QUE MUDAR ISSO
+            cropped_image = img[y:y+h,x:x+w] # 87: 212, 439, 135
+            # cropped_image = img[87:212, 135:439] # 87:212, 439:135
+
+            cv2.imwrite(output_path, cropped_image)
+            # cv2.imwrite(output_path, img)
         
         # desenhando quadradinhos verdes sobre a img 
         for i, (x, y, w, h) in enumerate(vagas):
@@ -74,18 +90,22 @@ def ParkingSpace():
             else:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
 
-            parking_status.append({"spot_id": i + 1, "status": status})  
+            vaga = i + 1
+            vaga = str(vaga)
+            parking_status.append({"spot_id": vaga, "status": status})  
+             # print (parking_status)
 
+        asyncio.create_task(send_parking_status(parking_status))
+        
 
-        # api_url = "http://127.0.0.1:8000/api/receive-status/"  
         # headers = {'Content-Type': 'application/json'}
-        # response = requests.post(api_url, data=json.dumps(parking_status), headers=headers)
 
-        # if response.status_code == 200:
-        #     print("Dados enviados com sucesso!")
-        # else:
-        #     print("Erro ao enviar os dados:", response.text)
-
+        # async with aiohttp.ClientSession() as session:
+        #     async with session.post('http://localhost:8000/api/receive-status/', data=json.dumps(parking_status), headers=headers) as response:
+        #         if response.status == 200:
+        #             print("Dados enviados com sucesso!")
+        #         else:
+        #             print("Erro ao enviar os dados:", await response.text())
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
@@ -97,7 +117,8 @@ def ParkingSpace():
     video.release()
     cv2.destroyAllWindows()
 
+
 cont = 0
 if cont == 0:
-
-    ParkingSpace()
+    import asyncio
+    asyncio.run(ParkingSpace())
