@@ -1,8 +1,10 @@
+import asyncio
 import aiohttp
 import cv2
 import numpy as np
 import requests
 import json
+# import time
 
 # from LPR.main import PlateRecognition
 
@@ -15,6 +17,33 @@ async def send_parking_status(parking_status):
                 print("Dados enviados com sucesso!")
             else:
                 print("Erro ao enviar os dados:", await response.text())
+
+async def get_parking_status():
+    headers = {'Content-Type': 'application/json'}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get('http://localhost:8000/api/status/', headers= headers) as response:
+            if response.status == 200:
+                try:
+                    data = await response.json()
+                    print("Dados recebidos com sucesso: ", data)
+                    return(data)
+                except aiohttp.ContentTypeError:
+                    text_data = await response.text()
+                    print("Dados recebidos como texto: ", text_data)
+                    return(text_data)
+            else: 
+                print("Erro ao recuperar os dados: ", await response.text())
+
+async def periodic_check(parking_status_func, interval, parking_space):
+    while True:
+        status_data = await parking_status_func()
+        if status_data != periodic_check.previous_status:
+            periodic_check.previous_status = status_data
+            await send_parking_status(parking_space)
+        await asyncio.sleep(interval)
+
+periodic_check.previous_status = None
 
 async def ParkingSpace():
     vaga1 = [1, 89, 108, 213]
@@ -34,7 +63,10 @@ async def ParkingSpace():
 
     capturado = [False] * len(vagas)
 
-    
+    parking_status = []
+
+    await periodic_check(get_parking_status, 2, parking_status)
+
 
     while check == True:
         check,img = video.read() 
@@ -51,21 +83,14 @@ async def ParkingSpace():
         imgDil = cv2.dilate(imgBlur, kernel)
         mask = np.zeros_like(img)
 
-        parking_status = []
+        
 
 
         def cropping_spaces(image, coordinates, output_path):
             img = cv2.imread(image)
-
             # x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
-    
-
-            # NAO PODE SER DO MAIOR PRO MENOR TEM QUE MUDAR ISSO
             cropped_image = img[y:y+h,x:x+w] # 87: 212, 439, 135
-            # cropped_image = img[87:212, 135:439] # 87:212, 439:135
-
             cv2.imwrite(output_path, cropped_image)
-            # cv2.imwrite(output_path, img)
         
         # desenhando quadradinhos verdes sobre a img 
         for i, (x, y, w, h) in enumerate(vagas):
@@ -78,8 +103,6 @@ async def ParkingSpace():
             if qtPxBranco > 4500 and not capturado[i]:
                 status="Occupied"
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255), 2)
-            
-
                 name_frame = f"frame_vaga{i+1}.jpg"
                 cv2.imwrite(name_frame, img)
                 capturado[i] = True
@@ -90,22 +113,14 @@ async def ParkingSpace():
             else:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
 
-            vaga = i + 1
-            vaga = str(vaga)
+            vaga = str(i + 1)
             parking_status.append({"spot_id": vaga, "status": status})  
              # print (parking_status)
 
-        asyncio.create_task(send_parking_status(parking_status))
-        
-
-        # headers = {'Content-Type': 'application/json'}
-
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.post('http://localhost:8000/api/receive-status/', data=json.dumps(parking_status), headers=headers) as response:
-        #         if response.status == 200:
-        #             print("Dados enviados com sucesso!")
-        #         else:
-        #             print("Erro ao enviar os dados:", await response.text())
+        # time.sleep(4)
+        # status_data = await get_parking_status()
+        # if status_data != parking_status:
+        #     await send_parking_status(parking_status)
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
@@ -118,7 +133,14 @@ async def ParkingSpace():
     cv2.destroyAllWindows()
 
 
-cont = 0
-if cont == 0:
-    import asyncio
-    asyncio.run(ParkingSpace())
+# cont = 0
+# if cont == 0:
+#     import asyncio
+#     asyncio.run(ParkingSpace())
+
+async def main():
+    video_task = asyncio.create_task(ParkingSpace())
+    await video_task
+
+
+asyncio.run(main())
