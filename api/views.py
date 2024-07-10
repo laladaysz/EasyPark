@@ -34,3 +34,16 @@ def receive_status(request):
 def get_status(request):
     return Response(parking_status, status=status.HTTP_200_OK)
 
+@api_view(['DELETE'])
+def delete_status(request):
+    global parking_status
+    spot_id = request.data.get('spot_id')
+
+    updated_status = [status for status in parking_status if status['spot_id'] != spot_id]
+    
+    if len(updated_status) == len(parking_status):
+        return Response({'error': 'spot_id not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    parking_status = updated_status
+    return Response({'message': f'Status for spot_id {spot_id} deleted'}, status=status.HTTP_200_OK)
+
