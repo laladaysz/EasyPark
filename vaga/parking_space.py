@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 import cv2
 import numpy as np
-import requests
+# import requests
 import json
 # import time
 
@@ -35,12 +35,12 @@ async def get_parking_status():
             else: 
                 print("Erro ao recuperar os dados: ", await response.text())
 
-async def periodic_check(parking_status_func, interval, parking_space):
+async def periodic_check(parking_status_func, interval, parking_status):
     while True:
         status_data = await parking_status_func()
         if status_data != periodic_check.previous_status:
             periodic_check.previous_status = status_data
-            await send_parking_status(parking_space)
+            await send_parking_status(parking_status)
         await asyncio.sleep(interval)
 
 periodic_check.previous_status = None
@@ -63,10 +63,12 @@ async def ParkingSpace():
 
     capturado = [False] * len(vagas)
 
-    parking_status = []
+    parking_status = [{'spot_id': '1', 'status': 'Free'}, {'spot_id': '2', 'status': 'Free'}, {'spot_id': '3', 'status': 'Free'},
+    {'spot_id': '4', 'status': 'Free'}, {'spot_id': '5', 'status': 'Free'}, {'spot_id': '6', 'status': 'Free'}, {'spot_id': '7', 'status': 'Free'}, 
+    {'spot_id': '8', 'status': 'Free'}]
+    # parking_status_dict = {}
 
-    await periodic_check(get_parking_status, 2, parking_status)
-
+    periodic_task = asyncio.create_task(periodic_check(get_parking_status, 2, parking_status))
 
     while check == True:
         check,img = video.read() 
@@ -82,9 +84,6 @@ async def ParkingSpace():
         kernel = np.ones((3,3),np.int8)
         imgDil = cv2.dilate(imgBlur, kernel)
         mask = np.zeros_like(img)
-
-        
-
 
         def cropping_spaces(image, coordinates, output_path):
             img = cv2.imread(image)
@@ -107,27 +106,43 @@ async def ParkingSpace():
                 cv2.imwrite(name_frame, img)
                 capturado[i] = True
                 print (f"capturado com sucesso! {i+1}")      
-                cropping_spaces(name_frame, vagas[i], f"crop_vaga{i+1}.jpg")   
-                continue
-    
+                cropping_spaces(name_frame, vagas[i], f"crop_vaga{i+1}.jpg")       
+
+
+                vaga = str(i + 1)
+                status_spot = {"spot_id": vaga, "status": status}
+
+                updated = False
+                for i in range(len(parking_status)):
+                    if parking_status[i]["spot_id"] == vaga:
+                        parking_status[i]["status"] = status
+                        updated = True
+                        
+                if not updated:
+                    parking_status.append(status_spot)
+
+                print(parking_status)
             else:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
+                
 
-            vaga = str(i + 1)
-            parking_status.append({"spot_id": vaga, "status": status})  
-             # print (parking_status)
+        #     vaga = str(i + 1)
+        #     parking_status_dict[vaga] = {"spot_id": vaga, "status": status}
+        
+        # print(list(parking_status_dict.values()))
 
-        # time.sleep(4)
-        # status_data = await get_parking_status()
-        # if status_data != parking_status:
-        #     await send_parking_status(parking_status)
+            
+        # parking_status.clear()
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
+
+        
         
         if cv2.waitKey(10) == 27: 
             break
 
+    await periodic_task
                 
     video.release()
     cv2.destroyAllWindows()

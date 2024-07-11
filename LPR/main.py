@@ -67,7 +67,7 @@ class PlateRecognition:
                         # cv2.putText(frame, standardized_text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # Escreve o texto da placa sobre o vídeo
 
         cv2.imshow('Frame', frame_resized)  # Mostra o frame processado
-        cv2.waitKey(1) & 0xFF == ord('q'):  # type: ignore # Se pressionar 'q', sai do loop
+        cv2.waitKey(1) & 0xFF == ord('q')   
         # self.cap.release()  # Libera o recurso de vídeo
         cv2.destroyAllWindows()  # Fecha todas as janelas abertas pelo OpenCV
         print("Total de carros detectados:", self.total_cars)
