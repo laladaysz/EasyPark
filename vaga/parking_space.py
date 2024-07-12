@@ -18,32 +18,32 @@ async def send_parking_status(parking_status):
             else:
                 print("Erro ao enviar os dados:", await response.text())
 
-async def get_parking_status():
-    headers = {'Content-Type': 'application/json'}
+# async def get_parking_status():
+#     headers = {'Content-Type': 'application/json'}
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get('http://localhost:8000/api/status/', headers= headers) as response:
-            if response.status == 200:
-                try:
-                    data = await response.json()
-                    print("Dados recebidos com sucesso: ", data)
-                    return(data)
-                except aiohttp.ContentTypeError:
-                    text_data = await response.text()
-                    print("Dados recebidos como texto: ", text_data)
-                    return(text_data)
-            else: 
-                print("Erro ao recuperar os dados: ", await response.text())
+#     async with aiohttp.ClientSession() as session:
+#         async with session.get('http://localhost:8000/api/status/', headers= headers) as response:
+#             if response.status == 200:
+#                 try:
+#                     data = await response.json()
+#                     print("Dados recebidos com sucesso: ", data)
+#                     return(data)
+#                 except aiohttp.ContentTypeError:
+#                     text_data = await response.text()
+#                     print("Dados recebidos como texto: ", text_data)
+#                     return(text_data)
+#             else: 
+#                 print("Erro ao recuperar os dados: ", await response.text())
 
-async def periodic_check(parking_status_func, interval, parking_status):
-    while True:
-        status_data = await parking_status_func()
-        if status_data != periodic_check.previous_status:
-            periodic_check.previous_status = status_data
-            await send_parking_status(parking_status)
-        await asyncio.sleep(interval)
+# async def periodic_check(parking_status_func, interval, parking_status):
+#     while True:
+#         status_data = await parking_status_func()
+#         if status_data != periodic_check.previous_status:
+#             periodic_check.previous_status = status_data
+#             await send_parking_status(parking_status)
+#         await asyncio.sleep(interval)
 
-periodic_check.previous_status = None
+# periodic_check.previous_status = None
 
 async def ParkingSpace():
     vaga1 = [1, 89, 108, 213]
@@ -57,7 +57,7 @@ async def ParkingSpace():
 
     vagas = [vaga1, vaga2, vaga3, vaga4, vaga5, vaga6, vaga7, vaga8]
 
-    video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas.mp4')
+    video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas_reverse.mp4')
     check = True
     # qPLR = PlateRecognition(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\placas.mp4')
 
@@ -68,7 +68,7 @@ async def ParkingSpace():
     {'spot_id': '8', 'status': 'Free'}]
     # parking_status_dict = {}
 
-    periodic_task = asyncio.create_task(periodic_check(get_parking_status, 2, parking_status))
+    # periodic_task = asyncio.create_task(periodic_check(get_parking_status, 2, parking_status))
 
     while check == True:
         check,img = video.read() 
@@ -122,8 +122,22 @@ async def ParkingSpace():
                     parking_status.append(status_spot)
 
                 print(parking_status)
-            else:
+                await send_parking_status(parking_status)
+            elif qtPxBranco < 4500:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
+                status = 'Free'
+
+                vaga = str(i + 1)
+                status_spot = {"spot_id": vaga, "status": status}
+
+                for i in range(len(parking_status)):
+                    if parking_status[i]["spot_id"] == vaga and parking_status[i]["status"] == 'Occupied':
+                        parking_status[i]["status"] = 'Free'
+                        print(parking_status)
+                        print("atualizei\n")
+                        await send_parking_status(parking_status)
+
+                
                 
 
         #     vaga = str(i + 1)
@@ -142,7 +156,7 @@ async def ParkingSpace():
         if cv2.waitKey(10) == 27: 
             break
 
-    await periodic_task
+    # await periodic_task
                 
     video.release()
     cv2.destroyAllWindows()
@@ -153,9 +167,10 @@ async def ParkingSpace():
 #     import asyncio
 #     asyncio.run(ParkingSpace())
 
-async def main():
-    video_task = asyncio.create_task(ParkingSpace())
-    await video_task
+# async def main():
+#     video_task = asyncio.create_task(ParkingSpace())
+#     await video_task
 
 
-asyncio.run(main())
+# asyncio.run(main())
+
