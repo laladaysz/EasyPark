@@ -6,7 +6,7 @@ import numpy as np
 import json
 # import time
 
-# from LPR.main import PlateRecognition
+from LPR.main import PlateRecognition
 
 async def send_parking_status(parking_status):
     headers = {'Content-Type': 'application/json'}
@@ -59,7 +59,7 @@ async def ParkingSpace():
 
     video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas_reverse.mp4')
     check = True
-    # qPLR = PlateRecognition(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\placas.mp4')
+    qPLR = PlateRecognition()
 
     capturado = [False] * len(vagas)
 
@@ -112,6 +112,9 @@ async def ParkingSpace():
                 vaga = str(i + 1)
                 status_spot = {"spot_id": vaga, "status": status}
 
+                crop_name = f'crop_vaga{vaga}.jpg'
+                qPLR.process_image(crop_name)
+
                 updated = False
                 for i in range(len(parking_status)):
                     if parking_status[i]["spot_id"] == vaga:
@@ -137,8 +140,6 @@ async def ParkingSpace():
                         print("atualizei\n")
                         await send_parking_status(parking_status)
 
-                
-                
 
         #     vaga = str(i + 1)
         #     parking_status_dict[vaga] = {"spot_id": vaga, "status": status}

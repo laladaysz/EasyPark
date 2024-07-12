@@ -11,7 +11,6 @@ class PlateRecognition:
         self.mot_tracker = Sort()  # Inicializa o rastreador SORT
         self.yolov5_model = torch.hub.load('ultralytics/yolov5', yolov5_model_path)  # Carrega o modelo YOLOv5
         self.plate_model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:\\Users\\ct67ca\\Desktop\\Easy_Park\\LPR\\plate.pt')  # Carrega um modelo personalizado para placas
-         # self.cap = cv2.VideoCapture(video_path)  # Abre o arquivo de vídeo
         self.recent_plates = deque(maxlen=max_recent_plates)  # Cria uma deque para armazenar as últimas placas detectadas
         self.total_cars = 0
         
@@ -34,28 +33,33 @@ class PlateRecognition:
         return ""  # Retorna string vazia se não tiver 7 caracteres
 
     def process_image(self, image):
-    # while self.cap.isOpened():
-    #     ret, frame = self.cap.read()  # Lê um frame do vídeo
-    #     if not ret:
-    #         break  # Se não conseguir ler, sai do loop
-
+        image = cv2.imread(image)
+        if image is None:
+            raise ValueError("Erro ao carregar imagem")
+        
         frame_resized = cv2.resize(image, (960, 540))  # Diminui a imagem para ser apresentada na inferencia
         frame_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Converte o frame de BGR para RGB
+        
         detections = self.yolov5_model(frame_rgb)  # Realiza a detecção de objetos no frame
-        vehicle_boxes = detections.xyxy[0][:, :4].cpu().numpy().astype(int)  # Extrai as caixas delimitadoras dos veículos
-        track_ids = self.mot_tracker.update(torch.Tensor(vehicle_boxes))  # Atualiza o rastreador com as caixas delimitadoras
+        vehicle_boxes = detections.xyxy[0][:, :4].cpu().numpy().astype(int) 
 
-        self.total_cars += len(vehicle_boxes)
+        if len(detections.xyxy[0]) == 0:
+            raise ValueError("Nenhum objeto detectado pelo modelp YOLOv5")
+
+        self.total_cars = len(vehicle_boxes)
+        print(f"Carro encontrado! {self.total_cars}")
 
         plate_outputs = self.plate_model(frame_rgb)  # Detecta placas no frame
         plate_detections = plate_outputs.xyxy[0][:, :4].cpu().numpy().astype(int)  # Extrai as caixas delimitadoras das placas
 
         for plate_box in plate_detections:  # Para cada placa detectada
             x1, y1, x2, y2 = map(int, plate_box)
-            # cv2.rectangle(frame_resized, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Converte as coordenadas da caixa para inteiros
+            cv2.rectangle(frame_resized, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Converte as coordenadas da caixa para inteiros
             plate_crop = frame_rgb[y1:y2, x1:x2]  # Extrai a imagem da placa
+
             preprocessed_plate = self.preprocess_image(plate_crop)  # Pré-processa a imagem da placa
             results = self.reader.readtext(preprocessed_plate)  # Lê o texto da placa
+          
 
             for (bbox, text, prob) in results:  # Para cada texto lido na placa
                 if prob > 0.5:  # Se a confiança do OCR for maior que 0.5
@@ -63,16 +67,13 @@ class PlateRecognition:
                     if standardized_text and standardized_text not in self.recent_plates:  # Se o texto for válido e não estiver nas placas recentes
                         self.recent_plates.append(standardized_text)  # Adiciona à lista de placas recentes
                         print("Detected plate:", standardized_text)  # Imprime a placa detectada
-                        # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)  # Desenha um retângulo ao redor da placa
-                        # cv2.putText(frame, standardized_text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)  # Escreve o texto da placa sobre o vídeo
-
+                        
         cv2.imshow('Frame', frame_resized)  # Mostra o frame processado
         cv2.waitKey(1) & 0xFF == ord('q')   
-        # self.cap.release()  # Libera o recurso de vídeo
         cv2.destroyAllWindows()  # Fecha todas as janelas abertas pelo OpenCV
         print("Total de carros detectados:", self.total_cars)
 
 
 
-plate_recognition = PlateRecognition(video_path='C:\\Users\\ct67ca\\Desktop\\Easy_Park\\videos\\placas.mp4')
-plate_recognition.process_video()
+plate_recognition = PlateRecognition()
+plate_recognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\crop_vaga1.png')
