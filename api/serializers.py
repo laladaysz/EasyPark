@@ -1,17 +1,14 @@
 from rest_framework import serializers
 from base.models import owner
 
-
-# class crop_spacesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = crop_spaces
-#         fields = ('id', 'image')
-
+class PlateSpotSerializer(serializers.Serializer):
+    spot_id = serializers.IntegerField()
+    plate = serializers.CharField(max_length=7)
 
 class ownerSerializer(serializers.ModelSerializer):
     class Meta:
         model = owner
-        fields = '__all__'
+        fields = ['area', 'number_plate']
 
 class StatusSpotserializer(serializers.Serializer):
     spot_id = serializers.IntegerField()
