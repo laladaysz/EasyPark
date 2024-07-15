@@ -6,7 +6,7 @@ import numpy as np
 import json
 # import time
 
-from LPR.main import PlateRecognition
+# from LPR.main import PlateRecognition
 
 async def send_parking_status(parking_status):
     headers = {'Content-Type': 'application/json'}
@@ -17,33 +17,6 @@ async def send_parking_status(parking_status):
                 print("Dados enviados com sucesso!")
             else:
                 print("Erro ao enviar os dados:", await response.text())
-
-# async def get_parking_status():
-#     headers = {'Content-Type': 'application/json'}
-
-#     async with aiohttp.ClientSession() as session:
-#         async with session.get('http://localhost:8000/api/status/', headers= headers) as response:
-#             if response.status == 200:
-#                 try:
-#                     data = await response.json()
-#                     print("Dados recebidos com sucesso: ", data)
-#                     return(data)
-#                 except aiohttp.ContentTypeError:
-#                     text_data = await response.text()
-#                     print("Dados recebidos como texto: ", text_data)
-#                     return(text_data)
-#             else: 
-#                 print("Erro ao recuperar os dados: ", await response.text())
-
-# async def periodic_check(parking_status_func, interval, parking_status):
-#     while True:
-#         status_data = await parking_status_func()
-#         if status_data != periodic_check.previous_status:
-#             periodic_check.previous_status = status_data
-#             await send_parking_status(parking_status)
-#         await asyncio.sleep(interval)
-
-# periodic_check.previous_status = None
 
 async def ParkingSpace():
     vaga1 = [1, 89, 108, 213]
@@ -59,16 +32,14 @@ async def ParkingSpace():
 
     video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas_reverse.mp4')
     check = True
-    qPLR = PlateRecognition()
+    # qPLR = PlateRecognition()
 
     capturado = [False] * len(vagas)
 
     parking_status = [{'spot_id': '1', 'status': 'Free'}, {'spot_id': '2', 'status': 'Free'}, {'spot_id': '3', 'status': 'Free'},
     {'spot_id': '4', 'status': 'Free'}, {'spot_id': '5', 'status': 'Free'}, {'spot_id': '6', 'status': 'Free'}, {'spot_id': '7', 'status': 'Free'}, 
     {'spot_id': '8', 'status': 'Free'}]
-    # parking_status_dict = {}
 
-    # periodic_task = asyncio.create_task(periodic_check(get_parking_status, 2, parking_status))
 
     while check == True:
         check,img = video.read() 
@@ -112,13 +83,12 @@ async def ParkingSpace():
                 vaga = str(i + 1)
                 status_spot = {"spot_id": vaga, "status": status}
 
-                crop_name = f'crop_vaga{vaga}.jpg'
-                qPLR.process_image(crop_name)
-
                 updated = False
                 for i in range(len(parking_status)):
                     if parking_status[i]["spot_id"] == vaga:
                         parking_status[i]["status"] = status
+                        crop_name = f'crop_vaga{vaga}.jpg'
+                        # qPLR.process_image(crop_name)
                         updated = True
                         
                 if not updated:
@@ -126,6 +96,8 @@ async def ParkingSpace():
 
                 print(parking_status)
                 await send_parking_status(parking_status)
+
+
             elif qtPxBranco < 4500:
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
                 status = 'Free'
@@ -140,15 +112,6 @@ async def ParkingSpace():
                         print("atualizei\n")
                         await send_parking_status(parking_status)
 
-
-        #     vaga = str(i + 1)
-        #     parking_status_dict[vaga] = {"spot_id": vaga, "status": status}
-        
-        # print(list(parking_status_dict.values()))
-
-            
-        # parking_status.clear()
-
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
 
@@ -156,22 +119,8 @@ async def ParkingSpace():
         
         if cv2.waitKey(10) == 27: 
             break
-
-    # await periodic_task
                 
     video.release()
     cv2.destroyAllWindows()
 
-
-# cont = 0
-# if cont == 0:
-#     import asyncio
-#     asyncio.run(ParkingSpace())
-
-# async def main():
-#     video_task = asyncio.create_task(ParkingSpace())
-#     await video_task
-
-
-# asyncio.run(main())
 

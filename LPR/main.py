@@ -1,7 +1,7 @@
 import cv2  # OpenCV para manipulação de imagem e vídeo
 import torch  # PyTorch, um framework de aprendizado de máquina
 import easyocr  # Biblioteca de OCR para reconhecimento de caracteres
-from LPR.sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
+from sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
 from collections import deque  # Importa deque, uma lista de alta performance
 import re  # Importa re para trabalhar com expressões regulares
 
@@ -13,15 +13,6 @@ class PlateRecognition:
         self.plate_model = torch.hub.load('ultralytics/yolov5', 'custom', path='C:\\Users\\ct67ca\\Desktop\\Easy_Park\\LPR\\plate.pt')  # Carrega um modelo personalizado para placas
         self.recent_plates = deque(maxlen=max_recent_plates)  # Cria uma deque para armazenar as últimas placas detectadas
         self.total_cars = 0
-        
-
-    # def preprocess_image(self, image):
-    #       # Converte a imagem para escala de cinza
-    #     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        
-    #     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-        
-    #     return binary  # Retorna a imagem processada
 
     def standardize_plate(self, text):
         text = re.sub(r'[^A-Z0-9]', '', text.upper())  # Remove caracteres não alfanuméricos e converte para maiúsculas
@@ -59,7 +50,6 @@ class PlateRecognition:
             plate_crop = frame_rgb[y1:y2, x1:x2]  # Extrai a imagem da placa
 
 
-            # preprocessed_plate = self.preprocess_image(plate_crop)  # Pré-processa a imagem da placa
             results = self.reader.readtext(plate_crop)  # Lê o texto da placa
 
             for (bbox, text, prob) in results:  # Para cada texto lido na placa
