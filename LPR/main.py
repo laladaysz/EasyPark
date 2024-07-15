@@ -1,7 +1,7 @@
 import cv2  # OpenCV para manipulação de imagem e vídeo
 import torch  # PyTorch, um framework de aprendizado de máquina
 import easyocr  # Biblioteca de OCR para reconhecimento de caracteres
-from sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
+from LPR.sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
 from collections import deque  # Importa deque, uma lista de alta performance
 import re  # Importa re para trabalhar com expressões regulares
 
@@ -15,11 +15,13 @@ class PlateRecognition:
         self.total_cars = 0
         
 
-    def preprocess_image(self, image):
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)  # Converte a imagem para escala de cinza
-        _, binary = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)  # Aplica limiarização binária
-        denoised = cv2.medianBlur(binary, 5)  # Aplica um filtro de mediana para reduzir ruído
-        return denoised  # Retorna a imagem processada
+    # def preprocess_image(self, image):
+    #       # Converte a imagem para escala de cinza
+    #     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        
+    #     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+        
+    #     return binary  # Retorna a imagem processada
 
     def standardize_plate(self, text):
         text = re.sub(r'[^A-Z0-9]', '', text.upper())  # Remove caracteres não alfanuméricos e converte para maiúsculas
@@ -47,26 +49,26 @@ class PlateRecognition:
             raise ValueError("Nenhum objeto detectado pelo modelp YOLOv5")
 
         self.total_cars = len(vehicle_boxes)
-        print(f"Carro encontrado! {self.total_cars}")
 
         plate_outputs = self.plate_model(frame_rgb)  # Detecta placas no frame
         plate_detections = plate_outputs.xyxy[0][:, :4].cpu().numpy().astype(int)  # Extrai as caixas delimitadoras das placas
 
-        for plate_box in plate_detections:  # Para cada placa detectada
+        for plate_box in plate_detections: # Para cada placa detectada 
             x1, y1, x2, y2 = map(int, plate_box)
             cv2.rectangle(frame_resized, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Converte as coordenadas da caixa para inteiros
             plate_crop = frame_rgb[y1:y2, x1:x2]  # Extrai a imagem da placa
 
-            preprocessed_plate = self.preprocess_image(plate_crop)  # Pré-processa a imagem da placa
-            results = self.reader.readtext(preprocessed_plate)  # Lê o texto da placa
-          
+
+            # preprocessed_plate = self.preprocess_image(plate_crop)  # Pré-processa a imagem da placa
+            results = self.reader.readtext(plate_crop)  # Lê o texto da placa
 
             for (bbox, text, prob) in results:  # Para cada texto lido na placa
                 if prob > 0.5:  # Se a confiança do OCR for maior que 0.5
                     standardized_text = self.standardize_plate(text)  # Padroniza o texto
                     if standardized_text and standardized_text not in self.recent_plates:  # Se o texto for válido e não estiver nas placas recentes
                         self.recent_plates.append(standardized_text)  # Adiciona à lista de placas recentes
-                        print("Detected plate:", standardized_text)  # Imprime a placa detectada
+                        print("Placa detectada:", standardized_text)  # Imprime a placa detectada
+
                         
         cv2.imshow('Frame', frame_resized)  # Mostra o frame processado
         cv2.waitKey(1) & 0xFF == ord('q')   
@@ -76,4 +78,4 @@ class PlateRecognition:
 
 
 plate_recognition = PlateRecognition()
-plate_recognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\crop_vaga1.png')
+plate_recognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg')
