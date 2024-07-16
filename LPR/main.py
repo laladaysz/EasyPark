@@ -1,7 +1,7 @@
 import cv2  # OpenCV para manipulação de imagem e vídeo
 import torch  # PyTorch, um framework de aprendizado de máquina
 import easyocr  # Biblioteca de OCR para reconhecimento de caracteres
-from sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
+from LPR.sort.sort_ import Sort  # Importa o algoritmo SORT para rastreamento de objetos
 from collections import deque  # Importa deque, uma lista de alta performance
 import re  # Importa re para trabalhar com expressões regulares
 
@@ -64,8 +64,9 @@ class PlateRecognition:
         cv2.waitKey(1) & 0xFF == ord('q')   
         cv2.destroyAllWindows()  # Fecha todas as janelas abertas pelo OpenCV
         print("Total de carros detectados:", self.total_cars)
+        return(standardized_text)
 
 
 
 plate_recognition = PlateRecognition()
-plate_recognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg')
+print(plate_recognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg'))

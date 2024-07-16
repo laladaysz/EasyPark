@@ -2,11 +2,9 @@ import asyncio
 import aiohttp
 import cv2
 import numpy as np
-# import requests
 import json
-# import time
-
 # from LPR.main import PlateRecognition
+from LPR.main import PlateRecognition
 
 async def send_parking_status(parking_status):
     headers = {'Content-Type': 'application/json'}
@@ -17,6 +15,18 @@ async def send_parking_status(parking_status):
                 print("Dados enviados com sucesso!")
             else:
                 print("Erro ao enviar os dados:", await response.text())
+
+
+async def send_plate(plate):
+    headers = { 'Content-Type': 'application/json'}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post('http://localhost:8000/api/receive-plate/', json=plate, headers=headers) as response:
+            if response.status == 201:
+                print('Placa enviada!')
+            else:
+                print('Erro ao enviar a placa: ', await response.text())
+
 
 async def ParkingSpace():
     vaga1 = [1, 89, 108, 213]
@@ -32,7 +42,7 @@ async def ParkingSpace():
 
     video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas_reverse.mp4')
     check = True
-    # qPLR = PlateRecognition()
+    plateRecognition = PlateRecognition()
 
     capturado = [False] * len(vagas)
 
@@ -88,7 +98,9 @@ async def ParkingSpace():
                     if parking_status[i]["spot_id"] == vaga:
                         parking_status[i]["status"] = status
                         crop_name = f'crop_vaga{vaga}.jpg'
-                        # qPLR.process_image(crop_name)
+                        # plateRecognition.process_image(crop_name)
+                        plate = str(plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg'))
+                        plate_spot = {"spot_id": vaga, "plate": plate}
                         updated = True
                         
                 if not updated:
@@ -96,6 +108,7 @@ async def ParkingSpace():
 
                 print(parking_status)
                 await send_parking_status(parking_status)
+                await send_plate(plate_spot)
 
 
             elif qtPxBranco < 4500:
