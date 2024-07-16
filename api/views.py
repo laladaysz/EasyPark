@@ -7,20 +7,11 @@ from .serializers import ownerSerializer, PlateSpotSerializer
 parking_status = []
 spot_plate = []
 
-# @api_view(['POST'])
-# def receive_crop(request):
-#     serializer = crop_spacesSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     return Response(serializer.erros, status=status.HTTP_400_BAD_REQUEST)
-
 @api_view(['GET'])
 def get_owner(request):
     owners = owner.objects.all()
     serializer = ownerSerializer(owners, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 @api_view(['POST'])
 def receive_status(request):
@@ -47,7 +38,6 @@ def delete_status(request):
     
     parking_status = updated_status
     return Response({'message': f'Status for spot_id {spot_id} deleted'}, status=status.HTTP_200_OK)
-
 
 @api_view(['POST'])
 def receive_plate(request):
@@ -81,3 +71,11 @@ def receive_owner(request):
     if serializer.is_valid():
         serializer.save()  # Salva a nova instância do modelo Owner
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+@api_view(['DELETE'])
+def delete_plate(request):
+    global spot_plate  # Declara a variável global para modificá-la
+
+    spot_plate.clear()  # Limpa todos os itens da lista
+
+    return Response({'message': 'All items removed'}, status=status.HTTP_200_OK)
