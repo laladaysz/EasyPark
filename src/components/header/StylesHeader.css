@@ -1,0 +1,52 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 23px;
+    box-shadow: 0 10px 20px 0px rgba(61, 61, 61, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.imgBoschEP {
+    width: 150px;
+    margin-left: 50px;
+}
+
+.linkLogout {
+    width: 50px;
+    margin-left: auto;
+    margin-right: 100px;
+}
+
+.imgLogout {
+    width: 50%;
+}
+
+a {
+    display: flex;
+    text-decoration: none;
+}
+
+.nav-text {
+    margin-left: 10px;
+    margin-top: 5px;
+    color: rgb(183, 183, 183);
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+
+.coresBosch {
+    width: 100%;
+    position: absolute;
+    bottom: -7px;
+    margin-left: -23px;
+}
