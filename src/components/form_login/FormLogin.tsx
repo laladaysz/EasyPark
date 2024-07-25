@@ -1,7 +1,6 @@
 import { useState } from "react";
 import LogoIMG from '../../assets/imgs/easyParkLogo.svg';
 import './StylesFormLogin.css';
-import { SignInButton } from "../SignInButton";
 
 export function FormLogin() {
     const [email, setEmail] = useState("");
@@ -37,9 +36,7 @@ export function FormLogin() {
                         <span className="focus-input" data-placeholder='Senha:'></span>
                     </div>
                     <div className="container-login-form-btn">
-                        <div className="login-form-btn">
-                            <input type="button" />
-                        </div>
+                        <button className="login-form-btn">Entrar</button>
                     </div>
                 </form>
             </div>
