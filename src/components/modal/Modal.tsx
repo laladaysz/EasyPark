@@ -1,14 +1,18 @@
 //import React from 'react';
 import styles from './Modal.module.css';
+import { StatusData, OwnerData } from '../monitoramento/Monitoramento';
+
 
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data: StatusData
+  data: StatusData | null;
+  ownerData: OwnerData | null;
 }
 
-export function Modal({ isOpen, onClose }: ModalProps) {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, ownerData }) => {
+  if (!isOpen) return null;
   if (isOpen) {
     return (
       <>
@@ -16,17 +20,17 @@ export function Modal({ isOpen, onClose }: ModalProps) {
         <div className={styles.modal_container} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modal_content}>
               <div className={styles.info_occupant}>
-                  <div className={styles.title}>
-                    <p>VAGA PIPIPI</p>
+              <div className={styles.title}>
+                      <p>VAGA {data?.spot_id ?? 'Carregando...'}</p>
                   </div>
                   <div className={styles.status_content}>
-                    <p>Status da vaga: <span className={styles.modal_status_vaga}>OCUPADA</span></p>
+                      <p>Status da vaga: <span className={styles.modal_status_vaga}>{data?.status.toUpperCase() ?? 'Carregando...'}</span></p>
                   </div>
                   <div className={styles.name_occupant_content}>
-                    <p>Nome do ocupante: <span className={styles.name}>pipipi popopo</span></p>
+                      <p>Nome do ocupante: <span className={styles.name}>{ownerData?.area ?? 'Carregando...'}</span></p>
                   </div>
                   <div className={styles.place_number_content}>
-                    <p>Placa do carro: <span className={styles.place_number}>HDR9X36</span></p>
+                      <p>Placa do carro: <span className={styles.place_number}>{ownerData?.plate_number ?? 'Carregando...'}</span></p>
                   </div>
                 </div>
               </div>
