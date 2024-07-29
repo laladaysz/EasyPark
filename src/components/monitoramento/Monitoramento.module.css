@@ -1,6 +1,6 @@
 .container {
     display: flex;
-    background-color: #F3F3F3;
+    background-color: #f3f3f3;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -73,6 +73,8 @@ hr {
     justify-content: center;
 }
 
+
+
 .vaga {
     width: 70%;
     height: 12em;
@@ -80,10 +82,15 @@ hr {
     border: none;
     cursor: pointer;
     transition: transform 0.3s ease;
+    background-color: #B0FFBD;
 }
 
 .vaga:hover {
     transform: scale(1.08);
+}
+
+.occupied {
+    background-color: #FF9F9F;
 }
 
 .vaga_marcacao {

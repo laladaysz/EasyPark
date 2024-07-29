@@ -41,6 +41,10 @@ export function Monitoramento(){
         };
     
         fetchData();
+        const intervalId = setInterval(fetchData, 5000);
+
+        // Cleanup do intervalo
+        return () => clearInterval(intervalId);
       }, []);
 
       if (loading) {
@@ -52,9 +56,11 @@ export function Monitoramento(){
       }
 
       const handleOpenModal = (spot: StatusData) => {
-        setSelectedSpot(spot);
-        setOpenModal(true);
-        return selectedSpot;
+        if (spot.status === 'Occupied') {
+          setSelectedSpot(spot);
+          setOpenModal(true);
+        }
+
       };
     
 
@@ -69,43 +75,22 @@ export function Monitoramento(){
                     <hr /> 
                 </div>
                 <div className={styles.grid_linhas}>
-                    {/* <div className={styles.linha_vertical_transparente}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A1</p>
-                    </div>
-                    <div className={styles.linha_vertical}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A2</p>
-                    </div>
-                    <div className={styles.linha_vertical}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A3</p>
-                    </div>
-                    <div className={styles.linha_vertical}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A4</p>
-                    </div>
-                    <div className={styles.linha_vertical}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A5</p>
-                    </div>
-                    <div className={styles.linha_vertical}>
-                        <button onClick={() => setOpenModal(true)} className={styles.vaga}></button>
-                        <p className={styles.vaga_marcacao}>A6</p>
-                    </div> */}
                     {Object.keys(statusData).map((spotId) => (
                         <div className={styles.linha_vertical} key={spotId}>
                             {statusData[Number(spotId)].map((item, index) => (
                                 <div key={index} className={styles.vaga_container}>
-                                    <button onClick={() => handleOpenModal(item)} className={styles.vaga}></button>
-                                    <p className={styles.vaga_marcacao}>{`Vaga ${spotId}`}</p>
-                                    <p className={styles.vaga_status}>{`Status: ${item.status}`}</p>
-                                </div>
+                                <button
+                                    onClick={() => handleOpenModal(item)}
+                                    className={`${item.status === 'Occupied' ? styles.occupied : ''} ${styles.vaga}`}
+                                ></button>
+                                <p className={styles.vaga_marcacao}>{`Vaga ${spotId}`}</p>
+                                {/* <p className={styles.vaga_status}>{`Status: ${item.status}`}</p> */}
+                            </div>
                             ))}
                         </div>
-                    ))}
+                      ))}
                     </div>
-                    <Modal isOpen={openModal} onClose={() => setOpenModal(false)}/>
+                    <Modal isOpen={openModal} onClose={() => setOpenModal(false)} data={selectedSpot}/>
                 </div> 
             </div>
         </>

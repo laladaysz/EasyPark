@@ -5,6 +5,7 @@ import styles from './Modal.module.css';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  data: StatusData
 }
 
 export function Modal({ isOpen, onClose }: ModalProps) {
