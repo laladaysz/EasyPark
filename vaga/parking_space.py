@@ -91,7 +91,7 @@ async def ParkingSpace():
 
 
                 vaga = str(i + 1)
-                status_spot = {"spot_id": vaga, "status": status}
+                status_spot = {"spot_id": str(vaga), "status": status}
 
                 updated = False
                 for i in range(len(parking_status)):
@@ -99,8 +99,8 @@ async def ParkingSpace():
                         parking_status[i]["status"] = status
                         crop_name = f'crop_vaga{vaga}.jpg'
                         # plateRecognition.process_image(crop_name)
-                        plate = str(plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg'))
-                        plate_spot = {"spot_id": vaga, "plate": plate}
+                        #plate = str(plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg')
+                        plate_spot = {"spot_id": str(vaga), "plate": 'RTZ9H06'}
                         updated = True
                         
                 if not updated:
