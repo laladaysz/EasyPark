@@ -2,7 +2,7 @@ from rest_framework import serializers
 from base.models import owner
 
 class PlateSpotSerializer(serializers.Serializer):
-    spot_id = serializers.IntegerField()
+    spot_id = serializers.CharField()
     plate = serializers.CharField(max_length=7)
 
 class ownerSerializer(serializers.ModelSerializer):
@@ -11,5 +11,5 @@ class ownerSerializer(serializers.ModelSerializer):
         fields = ['area', 'number_plate']
 
 class StatusSpotserializer(serializers.Serializer):
-    spot_id = serializers.IntegerField()
+    spot_id = serializers.CharField()
     status = serializers.CharField()
