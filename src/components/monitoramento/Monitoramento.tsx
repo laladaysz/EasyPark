@@ -105,7 +105,7 @@ export function Monitoramento(){
                         </div>
                     ))}
                     </div>
-                    <Modal isOpen={openModal}/>
+                    <Modal isOpen={openModal} onClose={() => setOpenModal(false)}/>
                 </div> 
             </div>
         </>

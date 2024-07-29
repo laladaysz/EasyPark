@@ -18,18 +18,43 @@
     background-color: white;
     display: flex;
     justify-content: center;
+    font-family: sans-serif;
 }
 
 .modal_content {
-    width: 80%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .info_ocupante {
-    
+    display: flex;
+    flex-direction: column;
 }
 
 .title {
-    font-size: 25px;
-    font-family: sans-serif;
     font-weight: bolder;
+    font-size: 25px;
+    margin-bottom: 25px
+}
+
+.modal_status_vaga {
+    color: rgb(255, 75, 75);
+    font-weight: bolder;
+    font-size: 15px;
+}
+
+.name_occupant_content {
+    font-size: 17px;
+    margin-top: 7px;
+}
+
+.place_number_content {
+    margin-top: 7px;
+}
+
+.place_number {
+    font-weight: bold;
 }
