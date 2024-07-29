@@ -27,10 +27,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, ownerData }
                       <p>Status da vaga: <span className={styles.modal_status_vaga}>{data?.status.toUpperCase() ?? 'Carregando...'}</span></p>
                   </div>
                   <div className={styles.name_occupant_content}>
-                      <p>Nome do ocupante: <span className={styles.name}>{ownerData?.area ?? 'Carregando...'}</span></p>
-                  </div>
-                  <div className={styles.place_number_content}>
-                      <p>Placa do carro: <span className={styles.place_number}>{ownerData?.plate_number ?? 'Carregando...'}</span></p>
+                      <p>Área do ocupante: <span className={styles.name}>{ownerData?.area ?? 'Carregando...'}</span></p>
                   </div>
                 </div>
               </div>
