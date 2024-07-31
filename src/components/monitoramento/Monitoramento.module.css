@@ -34,23 +34,24 @@
 }
 
 hr {
-    width: 80%;
+    width: 90%;
 }
 
 .grid_linhas {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 80%;
+    width: 90%;
     justify-content: center;
-    margin-left: 10%;
+    margin-left: 5%;
     text-align: center;
 }
 
 .linha_vertical_transparente {
     display: flex;
     height: 12em;
-    border-color: rgb(0, 0, 0);
+    border-left: 1.5px solid;
+    border-color: transparent;
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -77,7 +78,7 @@ hr {
 
 .vaga {
     width: 70%;
-    height: 12em;
+    height: 10em;
     margin-top: 15px;
     border: none;
     cursor: pointer;
