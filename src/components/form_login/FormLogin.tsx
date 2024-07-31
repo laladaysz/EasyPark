@@ -1,11 +1,17 @@
 import { useState } from "react";
 import LogoIMG from '../../assets/imgs/easyParkLogo.svg';
 import './StylesFormLogin.css';
+import { useNavigate } from "react-router-dom";
 //import { SignInButton } from "../SignInButton";
 
 export function FormLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate('/home'); // Redireciona para a rota /home
+      };
 
     return (
         <div className='container-login'>
@@ -37,7 +43,7 @@ export function FormLogin() {
                         <span className="focus-input" data-placeholder='Senha:'></span>
                     </div>
                     <div className="container-login-form-btn">
-                        <button className="login-form-btn">Entrar</button>
+                        <button onClick={handleClick} className="login-form-btn" >Entrar</button>
                     </div>
                 </form>
             </div>

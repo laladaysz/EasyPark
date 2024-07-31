@@ -25,6 +25,7 @@ export function Monitoramento(){
     const [openModal, setOpenModal] = useState(false);
     const [selectedSpot, setSelectedSpot] = useState<StatusData | null>(null);
     const [ownerData, setOwnerData] = useState<OwnerData | null>(null);
+    const contador = 0
 
     useEffect(() => {
         const fetchData = async () => {
@@ -105,6 +106,7 @@ export function Monitoramento(){
     const handleOpenModal = async (spot: StatusData) => {
         if (spot.status === 'Occupied') {
             setSelectedSpot(spot);
+            contador + 1
             try {
                 const plateData = await fetchPlateData(spot.spot_id);
                 if (plateData) {               
