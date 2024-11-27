@@ -23,7 +23,7 @@ class PlateRecognition:
             numbers = numbers.replace('O', '0').replace('I', '1').replace('S', '5')  # Substitui caracteres semelhantes
             text = letters[0:3] + numbers[0] + letters[3] + numbers[1:3]  # Reorganiza os caracteres
             return text  # Retorna a placa padronizada
-        return ""  # Retorna string vazia se não tiver 7 caracteres
+        return "Não possui 7 caracteres"  # Retorna string vazia se não tiver 7 caracteres
 
     def process_image(self, image):
         image = cv2.imread(image)
