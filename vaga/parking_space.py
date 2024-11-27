@@ -5,19 +5,20 @@ import numpy as np
 import json
 # from LPR.main import PlateRecognition
 from LPR.main import PlateRecognition
+from datetime import datetime
 
 async def registrarStatus(id, status):
     headers = {'Content-Type': 'application/json'}
     url = f'http://localhost:8083/vagas/{id}'
-    
-    payload = {"status": status}
+    payload = {"statusVaga": status}
+
 
     async with aiohttp.ClientSession() as session:
         async with session.put(url, json=payload, headers=headers) as response:
             if response.status == 200:
                 print("Dados enviados com sucesso!")
             else:
-                print("Erro ao enviar os dados:", await response.text())
+                print("\n\n Erro ao enviar os dados:", await response.text())
 
 
 async def registrarEntrada(plate, vaga):
@@ -25,24 +26,27 @@ async def registrarEntrada(plate, vaga):
     url = 'http://localhost:8083/entradaSaida'
     payload = {
         "placa": plate,
-        "numeroVaga": vaga
+        "numeroVaga": int(vaga)
         }
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=payload, headers=headers) as response:
-            if response.status == 201:
+            if response.status == 200:
                 print('Placa enviada!')
             else:
                 print('Erro ao enviar a placa: ', await response.text())
 
 
-async def registrarSaida(id_vaga):
+async def registrarSaida(id_vaga, hora_saida):
     headers = { 'Content-Type': 'application/json'}
     url = f'http://localhost:8083/entradaSaida/{id_vaga}'
+    playload = {
+        "horaSaida": hora_saida,
+    }
 
     async with aiohttp.ClientSession() as session:
-        async with session.put(url, headers=headers) as response:
-            if response.status == 201:
+        async with session.put(url, json=playload, headers=headers) as response:
+            if response.status == 200:
                 print('Saída registrada com sucesso!')
             else:
                 print('Erro ao registrar saída: ', await response.text())
@@ -151,8 +155,9 @@ async def ParkingSpace():
                 print(f"Vaga {vaga_id} liberada!")
                 status = "STATUS_LIVRE"
 
+                hora_saida = datetime.utcnow().isoformat() 
                 await registrarStatus(vaga_id, status)
-                await registrarSaida(vaga_id)
+                await registrarSaida(vaga_id, hora_saida)
 
 
                 
