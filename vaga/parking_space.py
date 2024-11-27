@@ -3,7 +3,6 @@ import aiohttp
 import cv2
 import numpy as np
 import json
-# from LPR.main import PlateRecognition
 from LPR.main import PlateRecognition
 from datetime import datetime
 
@@ -70,11 +69,6 @@ async def ParkingSpace():
 
     capturado = [False] * len(vagas)
 
-    # parking_status = [{'spot_id': '1', 'status': 'Free'}, {'spot_id': '2', 'status': 'Free'}, {'spot_id': '3', 'status': 'Free'},
-    # {'spot_id': '4', 'status': 'Free'}, {'spot_id': '5', 'status': 'Free'}, {'spot_id': '6', 'status': 'Free'}, {'spot_id': '7', 'status': 'Free'}, 
-    # {'spot_id': '8', 'status': 'Free'}]
-
-
     while check == True:
         check,img = video.read() 
         
@@ -92,7 +86,6 @@ async def ParkingSpace():
 
         def cropping_spaces(image, coordinates, output_path):
             img = cv2.imread(image)
-            # x1, y1, x2, y2 = coordinates # 439, 87, 135, 212
             cropped_image = img[y:y+h,x:x+w] # 87: 212, 439, 135
             cv2.imwrite(output_path, cropped_image)
         
@@ -102,12 +95,10 @@ async def ParkingSpace():
             recorte = imgDil[y:y+h,x:x+w]
             qtPxBranco = cv2.countNonZero(recorte)
             cv2.putText(img,str(qtPxBranco),(x,y+h-10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1)
-            # status = "Free"
 
             vaga_id = str(i+1)
             
             if qtPxBranco > 4500 and not capturado[i]:
-                # status="Occupied"
 
                 capturado[i] = True
                 print (f"capturado com sucesso! {i+1}")
@@ -127,27 +118,6 @@ async def ParkingSpace():
                 await registrarEntrada(plate, vaga_id)
 
 
-
-                # vaga = str(i + 1)
-                # status_spot = {"spot_id": str(vaga), "status": status}
-
-                # for i in range(len(parking_status)):
-                #     if parking_status[i]["spot_id"] == vaga:
-                #         parking_status[i]["status"] = status
-                #         crop_name = f'crop_vaga{vaga}.jpg'
-                #         # plateRecognition.process_image(crop_name)
-                #         # plate = str(plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\Easy_Park\carre.jpg')
-                #         plate_spot = {"spot_id": str(vaga), "plate": 'RTZ9H06'}
-                #         updated = True
-                        
-                # if not updated:
-                #     parking_status.append(status_spot)
-
-                # print(parking_status)
-                # await send_parking_status(parking_status)
-                # await send_plate(plate_spot)
-
-
             elif qtPxBranco < 4500 and capturado[i]:
 
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
@@ -158,20 +128,6 @@ async def ParkingSpace():
                 hora_saida = datetime.utcnow().isoformat() 
                 await registrarStatus(vaga_id, status)
                 await registrarSaida(vaga_id, hora_saida)
-
-
-                
-                # status = 'Free'
-
-                # vaga = str(i + 1)
-                # status_spot = {"spot_id": vaga, "status": status}
-
-                # for i in range(len(parking_status)):
-                #     if parking_status[i]["spot_id"] == vaga and parking_status[i]["status"] == 'Occupied':
-                #         parking_status[i]["status"] = 'Free'
-                #         print(parking_status)
-                #         print("atualizei\n")
-                #         await send_parking_status(parking_status)
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
