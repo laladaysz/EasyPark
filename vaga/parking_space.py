@@ -123,10 +123,10 @@ async def ParkingSpace():
                 cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2)
                 capturado[i] = False
                 print(f"Vaga {vaga_id} liberada!")
-                status = "STATUS_LIVRE"
+                # status = "STATUS_LIVRE"
 
                 hora_saida = datetime.utcnow().isoformat() 
-                await registrarStatus(vaga_id, status)
+                # await registrarStatus(vaga_id, status)
                 await registrarSaida(vaga_id, hora_saida)
 
         masked_img = cv2.bitwise_and(img, mask)
