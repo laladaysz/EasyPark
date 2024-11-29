@@ -8,7 +8,7 @@ from datetime import datetime
 
 async def registrarStatus(id, status):
     headers = {'Content-Type': 'application/json'}
-    url = f'http://localhost:8083/vagas/{id}'
+    url = f'http://localhost:8083/vagas?numVaga={id}'
     payload = {"statusVaga": status}
 
 
@@ -112,10 +112,27 @@ async def ParkingSpace():
                 cropping_spaces(name_frame, vagas[i], f"crop_vaga{i+1}.jpg")   
 
                 crop_name = f'crop_vaga{vaga_id}.jpg'
-                plate = plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\EASYPARK - PIM\carre.jpg')
-                print(f"Placa detectada: {plate}")
 
-                await registrarEntrada(plate, vaga_id)
+                plate = 0
+
+                if vaga_id == "4":
+                    plate = plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\EASYPARK - PIM\carre.jpg')
+                    print(f"Placa detectada: {plate}")
+                    await registrarEntrada(plate, vaga_id)
+
+                elif vaga_id == "5":
+                    plate = plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\EASYPARK - PIM\carro 3.png')
+                    print(f"Placa detectada: {plate}")
+
+                    await registrarEntrada(plate, vaga_id)
+
+                elif vaga_id == "6":
+                    plate = plateRecognition.process_image(r'C:\Users\ct67ca\Desktop\EASYPARK - PIM\carros 1.jpg')
+                    print(f"Placa detectada: {plate}")
+
+                    await registrarEntrada(plate, vaga_id)
+                
+                
 
 
             elif qtPxBranco < 4500 and capturado[i]:
