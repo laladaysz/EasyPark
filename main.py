@@ -1,5 +1,5 @@
 import asyncio
-from vaga.parking_space import ParkingSpace
+from monitoring.parking_space import ParkingSpace
 
 
 if __name__ == "__main__":
