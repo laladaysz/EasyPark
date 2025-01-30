@@ -1,21 +1,23 @@
-import cv2
-import numpy as np
-import json
 from LPR.main import PlateRecognition
+from dotenv import load_dotenv
 from datetime import datetime
 from monitoring import api
+import numpy as np
+import json
+import cv2
+import os 
 
 async def ParkingSpace():
 
+    plateRecognition = PlateRecognition()
+    load_dotenv()
     with open("vagas.json", "r") as file:
         data = json.load(file) 
 
     vagas = data["vagas"]  
-
-    video = cv2.VideoCapture(r'C:\Users\ct67ca\Desktop\Easy_Park\videos\vagas_reverse.mp4')
+    video_path = os.getenv("VIDEO_PATH")
+    video = cv2.VideoCapture(video_path)    
     check = True
-    plateRecognition = PlateRecognition()
-
     capturado = [False] * len(vagas)
 
     while check == True:
@@ -79,9 +81,6 @@ async def ParkingSpace():
                     print(f"Placa detectada: {plate}")
 
                     await api.registrarEntrada(plate, vaga_id)
-                
-                
-
 
             elif qtPxBranco < 4500 and capturado[i]:
 
@@ -96,13 +95,9 @@ async def ParkingSpace():
 
         masked_img = cv2.bitwise_and(img, mask)
         cv2.imshow('video', masked_img)
-
-        
         
         if cv2.waitKey(10) == 27: 
             break
                 
     video.release()
     cv2.destroyAllWindows()
-
-
