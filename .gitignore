@@ -9,4 +9,4 @@ chars.pt/
 __pycache__/
 carre.jpg/
 image.jpg/
-.env/
+.env
